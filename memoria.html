@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jogo da Memória</title>
+<style>
+
+body {
+font-family: Arial, sans-serif;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+height: 100vh;
+margin: 0;
+}
+
+.grid {
+display: grid;
+grid-template-columns: repeat(4, 100px);
+gap: 10px;
+}
+
+.card {
+width: 100px;
+height: 100px;
+display: flex;
+align-items: center;
+justify-content: center;
+background-color: #3d4b5b;
+color: rgb(255, 255, 255);
+font-size: 24px;
+cursor: pointer;
+border-radius: 8px;
+user-select: none; 
+}
+.flipped, matched {
+background-color: #af4c4c;
+}
+.matched {
+cursor: default;
+}
+
+button {
+margin-top: 20px;
+padding: 10px 20px;
+font-size: 16px;
+}
+</style>
+</head>
+
+<body>
+<div class="grid" id="grid"></div>
+<button id="restartButton">Recomeçar o Jogo</button>
+
+<script>
+const cardValues = ["A", "A", "B", "B", "C", "C", "D", "D", "E", "E", "F", "F", "G", "G", "H", "H"];
+const grid = document.getElementById("grid");
+const restartButton = document.getElementById("restartButton");
+let firstCard = null;
+let secondCard = null;
+let lockBoard = false; 
+
+
+function shuffle(array) {
+return array.sort(() => Math.random () - 0.5);
+}
+
+
+function createBoard() {
+grid.innerHTML = ""; 
+const shuffledCards = shuffle([...cardValues]); 
+shuffledCards.forEach(value => {
+const card = document.createElement("div");
+card.classList.add("card"); 
+card.dataset.value = value;
+card.addEventListener("click", flipCard);
+grid.appendChild(card);
+});
+resetGame(); 
+}
+
+
+function flipCard() {
+if (lockBoard || this.classList.contains("flipped") || this.classList.contains("matched")) return;
+
+this.textContent = this.dataset.value; 
+this.classList.add("flipped");
+
+if (!firstCard) {
+firstCard = this; 
+} else {
+secondCard = this; 
+checkMatch(); 
+}
+}
+
+function checkMatch() {
+lockBoard = true; 
+if (firstCard.dataset.value === secondCard.dataset.value) {
+firstCard.classList.add("matched");
+secondCard.classList.add("matched");
+resetCards();
+} else {
+
+
+setTimeout(() => {
+firstCard.textContent = ""; 
+secondCard.textContent = ""; 
+firstCard.classList.remove("flipped"); 
+secondCard.classList.remove("flipped"); 
+resetCards(); 
+}, 1000);
+}
+}
+
+
+function resetCards() {
+firstCard = null; 
+secondCard = null; 
+lockBoard = false; 
+}
+
+
+function resetGame() {
+firstCard = null; 
+secondCard = null; 
+lockBoard = false; 
+}
+
+
+restartButton.addEventListener("click", createBoard);
+
+
+createBoard();
+</script>
+</body>
+</html>
